@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in | BioQuiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+<div class="page">
+    <div class="background-pattern">
+        <div class="orb orb-one"></div>
+        <div class="orb orb-two"></div>
+    </div>
+    <main class="card" role="form">
+        <section class="card__hero">
+            <h1>Welcome back</h1>
+            <p>Access your biology quizzes dashboard and keep your learning streak alive.</p>
+        </section>
+        <form th:action="@{/login}" method="post" class="card__form">
+            <div class="alert alert--error" th:if="${param.error}">
+                <span>Incorrect username or password. Please try again.</span>
+            </div>
+            <div class="alert alert--success" th:if="${param.logout}">
+                <span>You have been signed out successfully.</span>
+            </div>
+            <label class="field">
+                <span>Username</span>
+                <input type="text" name="username" placeholder="Enter your username" required autofocus>
+            </label>
+            <label class="field">
+                <span>Password</span>
+                <input type="password" name="password" placeholder="Enter your password" required>
+            </label>
+            <div class="form-options">
+                <label class="remember">
+                    <input type="checkbox" name="remember-me">
+                    <span>Remember me</span>
+                </label>
+                <a class="link" href="#" aria-disabled="true">Forgot password?</a>
+            </div>
+            <button type="submit" class="primary-button">Sign in</button>
+        </form>
+        <p class="card__footer">
+            New to BioQuiz?
+            <a href="#" class="link" aria-disabled="true">Create an account</a>
+        </p>
+    </main>
+</div>
+</body>
+</html>
