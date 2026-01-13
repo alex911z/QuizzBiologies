@@ -21,6 +21,7 @@
             <p>Access your biology quizzes dashboard and keep your learning streak alive.</p>
         </section>
         <form th:action="@{/login}" method="post" class="card__form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <div class="alert alert--error" th:if="${param.error}">
                 <span>Incorrect username or password. Please try again.</span>
             </div>
@@ -46,7 +47,7 @@
         </form>
         <p class="card__footer">
             New to BioQuiz?
-            <a href="#" class="link" aria-disabled="true">Create an account</a>
+            <a th:href="@{/register}" class="link">Create an account</a>
         </p>
     </main>
 </div>

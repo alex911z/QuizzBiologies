@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Test: ' + ${test.name}">Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <style>
+        .quiz-card { background: var(--panel); border: 1px solid var(--border); border-radius: 28px; padding: 1.75rem; max-width: 960px; margin: 0 auto; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 20px 45px rgba(0,0,0,0.5); }
+        .question { margin: 1.3rem 0; padding: 1rem; border-radius: 18px; border: 1px solid var(--border); background: rgba(255, 255, 255, 0.03); }
+        .options { display: grid; gap: 0.5rem; }
+        .options label { display: flex; gap: 0.5rem; align-items: center; cursor: pointer; }
+        .result { margin-bottom: 1rem; padding: 1rem; border-radius: 18px; border: 1px solid var(--border); background: rgba(34, 197, 94, 0.12); }
+        .muted { color: var(--muted); }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">
+            <p class="eyebrow">BioQuiz</p>
+            <h2 th:text="${test.name}">Test</h2>
+        </div>
+        <nav class="nav">
+            <a class="nav-button" th:href="@{/tests/available}">← Înapoi la teste</a>
+            <a class="nav-button" th:href="@{/dashboard}">Dashboard</a>
+        </nav>
+        <form class="logout-form" th:action="@{/logout}" method="post">
+            <button class="ghost-button" type="submit">Log out</button>
+        </form>
+    </aside>
+    <main class="content">
+        <div class="quiz-card">
+            <div class="quiz-header">
+                <p class="eyebrow">Rezolvă testul</p>
+                <h1 th:text="${test.name}">Nume test</h1>
+                <p class="muted" th:text="${test.description != null ? test.description : 'Fără descriere'}"></p>
+            </div>
+
+            <div th:if="${submitted}" class="result">
+                <p><strong>Răspunsuri corecte:</strong> <span th:text="${correct}">0</span> / <span th:text="${total}">0</span></p>
+                <p><strong>Nota:</strong> <span th:text="${grade}">10</span> / 10</p>
+            </div>
+
+            <div th:if="${#lists.isEmpty(questions)}">
+                <p class="muted">Acest test nu are întrebări încă.</p>
+            </div>
+
+            <form th:if="${!#lists.isEmpty(questions)}" th:action="@{'/tests/' + ${test.id} + '/take'}" method="post">
+                <div th:each="q : ${questions}" class="question">
+                    <strong th:text="${q.text}">Întrebare</strong>
+                    <div class="options">
+                        <label>
+                            <input type="radio" th:name="${'q' + q.id}" value="0" required>
+                            <span th:text="${q.optionA}">A</span>
+                        </label>
+                        <label>
+                            <input type="radio" th:name="${'q' + q.id}" value="1">
+                            <span th:text="${q.optionB}">B</span>
+                        </label>
+                        <label>
+                            <input type="radio" th:name="${'q' + q.id}" value="2">
+                            <span th:text="${q.optionC}">C</span>
+                        </label>
+                        <label>
+                            <input type="radio" th:name="${'q' + q.id}" value="3">
+                            <span th:text="${q.optionD}">D</span>
+                        </label>
+                    </div>
+                </div>
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div class="button-row">
+                    <button type="submit" class="primary-button">Trimite răspunsurile</button>
+                    <a class="secondary-button" th:href="@{/tests/available}">Înapoi</a>
+                </div>
+                <p class="muted">Notarea este pe scala 1-10, proporțional cu răspunsurile corecte.</p>
+            </form>
+        </div>
+    </main>
+</div>
+</body>
+</html>

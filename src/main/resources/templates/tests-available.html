@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste disponibile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <style>
+        .test-card { padding: 1.2rem; border-radius: 18px; border: 1px solid var(--border); background: rgba(255,255,255,0.04); }
+        .muted { color: var(--muted); margin: 0.2rem 0 0; }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">
+            <p class="eyebrow">BioQuiz</p>
+            <h2>Teste disponibile</h2>
+        </div>
+        <nav class="nav">
+            <a class="nav-button" th:href="@{/dashboard}">← Înapoi la dashboard</a>
+        </nav>
+        <form class="logout-form" th:action="@{/logout}" method="post">
+            <button class="ghost-button" type="submit">Log out</button>
+        </form>
+    </aside>
+    <main class="content">
+        <header class="content-header">
+            <p class="eyebrow">Elev</p>
+            <h1>Teste pe care le poți da</h1>
+            <p class="subtitle">Alege un test și rezolvă-l.</p>
+        </header>
+
+        <section class="panel is-active">
+            <div class="panel-card">
+                <p class="subtitle" th:if="${#lists.isEmpty(tests)}">Nu există teste încă.</p>
+                <div class="panel-grid" th:if="${!#lists.isEmpty(tests)}">
+                    <article class="test-card" th:each="test : ${tests}">
+                        <strong th:text="${test.name}">Nume test</strong>
+                        <p class="muted" th:text="${test.description != null ? test.description : 'Fără descriere'}">Descriere</p>
+                        <div class="button-row" style="margin-top: 0.75rem;">
+                            <a class="primary-button" th:href="@{'/tests/' + ${test.id} + '/take'}">Rezolvă testul</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

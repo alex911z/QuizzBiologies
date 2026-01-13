@@ -47,107 +47,94 @@
         <section class="panel is-active" id="view-home">
             <div class="panel-grid">
                 <article>
-                    <p class="eyebrow">Streak</p>
-                    <h3>7 zile consecutive</h3>
-                    <p>Ține ritmul și completează cel puțin un test pe zi.</p>
+                    <p class="eyebrow">Teste finalizate</p>
+                    <h3 th:text="${resultsCount != null ? resultsCount : 0}">0</h3>
+                    <p class="subtitle">Numărul testelor completate de tine.</p>
                 </article>
                 <article>
-                    <p class="eyebrow">Teste programate</p>
-                    <h3>3 teste</h3>
-                    <p>Capitole: Genetică, Ecologie și Celulă.</p>
+                    <p class="eyebrow">Media notelor</p>
+                    <h3 th:text="${avgScore != null ? avgScore : 0}">0</h3>
+                    <p class="subtitle">Pe scala 1-10.</p>
                 </article>
                 <article>
-                    <p class="eyebrow">Media generală</p>
-                    <h3>9.40</h3>
-                    <p>+0.25 față de săptămâna trecută.</p>
+                    <div th:if="${role == 'TEACHER'}">
+                        <p class="eyebrow">Teste create</p>
+                        <h3 th:text="${teacherTestsCount != null ? teacherTestsCount : 0}">0</h3>
+                        <p class="subtitle" th:text="'Total întrebări: ' + (${teacherQuestionsCount != null ? teacherQuestionsCount : 0})">Întrebări</p>
+                    </div>
+                    <div th:if="${role != 'TEACHER'}">
+                        <p class="eyebrow">Ultimul rezultat</p>
+                        <h3 th:text="${lastScore != null ? lastScore + '/10' : 'N/A'}">N/A</h3>
+                        <p class="subtitle" th:text="${lastTestName != null ? lastTestName : 'Fă un test pentru a vedea rezultate'}"></p>
+                    </div>
                 </article>
             </div>
             <div class="panel-card">
                 <h2>Ce urmează</h2>
                 <ul class="checklist">
-                    <li>Finalizează testul la „Structura celulei”.</li>
-                    <li>Revezi feedback-ul profesorului pentru „Ecologie”.</li>
-                    <li>Adaugă notițe noi pentru lecția de mâine.</li>
+                    <li th:if="${role == 'TEACHER'}">Adaugă întrebări la testele tale din secțiunea Teste.</li>
+                    <li th:if="${role == 'TEACHER'}">Asigură-te că fiecare întrebare are răspunsul corect setat.</li>
+                    <li th:if="${role != 'TEACHER'}">Finalizează un test sau quiz pentru a-ți vedea progresul.</li>
+                    <li th:if="${role != 'TEACHER'}">Reia testele pentru a-ți crește media.</li>
                 </ul>
             </div>
         </section>
         <section class="panel" id="view-tests">
             <div class="panel-card">
-                <h2>Teste deschise</h2>
-                <div class="list">
-                    <article>
-                        <strong>Fiziologie umană</strong>
-                        <p>Deadline: 20 noiembrie · 40 întrebări</p>
-                    </article>
-                    <article>
-                        <strong>Genetică aplicată</strong>
-                        <p>Deadline: 24 noiembrie · 30 întrebări</p>
-                    </article>
-                    <article>
-                        <strong>Botanică</strong>
-                        <p>Deadline: 28 noiembrie · 20 întrebări</p>
-                    </article>
+                <div th:if="${role == 'TEACHER'}">
+                    <h2>Teste (profesor)</h2>
+                    <p>Gestionează testele direct din aplicație.</p>
+                    <div class="button-row">
+                        <a class="primary-button" th:href="@{/tests}">Creează / vezi testele</a>
+                    </div>
+                </div>
+                <div th:if="${role != 'TEACHER'}">
+                    <h2>Teste disponibile</h2>
+                    <p>Vezi ce teste a creat profesorul și rezolvă-le.</p>
+                    <div class="button-row">
+                        <a class="primary-button" th:href="@{/tests/available}">Vezi testele</a>
+                    </div>
                 </div>
             </div>
             <div class="panel-card">
-                <h2>Acțiuni rapide</h2>
-                <div class="button-row">
-                    <button type="button" class="primary-button">Creează test</button>
-                    <button type="button" class="secondary-button">Importă întrebări</button>
-                </div>
+                <h2>Quiz rapid (10 întrebări)</h2>
+                <p>Răspunde la un set de întrebări de biologie și vezi nota 1-10.</p>
+                <a class="secondary-button" th:href="@{/quiz/simple}">Începe quiz-ul</a>
             </div>
         </section>
         <section class="panel" id="view-results">
             <div class="panel-card">
                 <h2>Rezultate recente</h2>
-                <div class="table">
+                <div th:if="${results == null || #lists.isEmpty(results)}">
+                    <p class="subtitle">Nu ai rezultate încă. Încearcă un test.</p>
+                </div>
+                <div class="table" th:if="${results != null && !#lists.isEmpty(results)}">
                     <div class="table-row table-head">
                         <span>Test</span>
                         <span>Data</span>
                         <span>Scor</span>
                     </div>
-                    <div class="table-row">
-                        <span>Ecologie</span>
-                        <span>12 nov</span>
-                        <span class="tag tag-green">94%</span>
-                    </div>
-                    <div class="table-row">
-                        <span>Genetică</span>
-                        <span>10 nov</span>
-                        <span class="tag tag-yellow">82%</span>
-                    </div>
-                    <div class="table-row">
-                        <span>Celulă</span>
-                        <span>07 nov</span>
-                        <span class="tag tag-red">71%</span>
+                    <div class="table-row" th:each="r : ${results}">
+                        <span th:text="${r.testName}">Test</span>
+                        <span th:text="${#temporals.format(r.createdAt, 'dd MMM HH:mm')}">Data</span>
+                        <span class="tag tag-green" th:text="${r.score} + '/10'">10/10</span>
                     </div>
                 </div>
             </div>
         </section>
         <section class="panel" id="view-statistics">
             <div class="panel-card">
-                <h2>Progres pe capitole</h2>
-                <div class="stats">
+                <h2>Statistici personale</h2>
+                <div class="panel-grid">
                     <article>
-                        <p>Genetică</p>
-                        <div class="bar">
-                            <span style="width: 85%"></span>
-                        </div>
-                        <small>85% stăpânire</small>
+                        <p class="eyebrow">Număr teste</p>
+                        <h3 th:text="${resultsCount != null ? resultsCount : 0}">0</h3>
+                        <p class="subtitle">Teste finalizate de tine.</p>
                     </article>
                     <article>
-                        <p>Fiziologie</p>
-                        <div class="bar">
-                            <span style="width: 65%"></span>
-                        </div>
-                        <small>65% stăpânire</small>
-                    </article>
-                    <article>
-                        <p>Ecologie</p>
-                        <div class="bar">
-                            <span style="width: 72%"></span>
-                        </div>
-                        <small>72% stăpânire</small>
+                        <p class="eyebrow">Media notelor</p>
+                        <h3 th:text="${avgScore != null ? avgScore : 0}">0</h3>
+                        <p class="subtitle">Pe scala 1-10.</p>
                     </article>
                 </div>
             </div>

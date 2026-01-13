@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste profesor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <style>
+        .form-grid { display: grid; gap: 0.75rem; }
+        .field label { display: block; margin-bottom: 0.3rem; color: var(--muted); }
+        .field input { width: 100%; padding: 0.7rem 0.85rem; border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.04); color: var(--text); }
+        .tests-list article { padding: 1rem; border-radius: 16px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); }
+        .muted { color: var(--muted); }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">
+            <p class="eyebrow">BioQuiz</p>
+            <h2>Gestionare teste</h2>
+        </div>
+        <nav class="nav">
+            <a class="nav-button" th:href="@{/dashboard}">← Înapoi la dashboard</a>
+        </nav>
+        <form class="logout-form" th:action="@{/logout}" method="post">
+            <button class="ghost-button" type="submit">Log out</button>
+        </form>
+    </aside>
+    <main class="content">
+        <header class="content-header">
+            <p class="eyebrow">Profesor</p>
+            <h1>Teste create</h1>
+            <p class="subtitle">Listează și adaugă teste noi.</p>
+        </header>
+
+        <section class="panel is-active">
+            <div class="panel-card">
+                <h2>Crează un test nou</h2>
+                <form class="form-grid" th:action="@{/tests/create}" method="post">
+                    <div class="field">
+                        <label for="name">Nume test</label>
+                        <input id="name" name="name" type="text" placeholder="Ex: Fotosinteza – capitolul 1" required>
+                    </div>
+                    <div class="field">
+                        <label for="description">Descriere (opțional)</label>
+                        <input id="description" name="description" type="text" placeholder="Adaugă o scurtă descriere">
+                    </div>
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <div class="button-row">
+                        <button type="submit" class="primary-button">Salvează testul</button>
+                        <a class="secondary-button" th:href="@{/dashboard}">Anulează</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="panel-card">
+                <h2>Teste existente</h2>
+                <p class="subtitle" th:if="${#lists.isEmpty(tests)}">Nu există teste încă.</p>
+                <div class="tests-list panel-grid" th:if="${!#lists.isEmpty(tests)}">
+                    <article th:each="test : ${tests}">
+                        <strong th:text="${test.name}">Nume test</strong>
+                        <p class="muted" th:text="${test.description != null ? test.description : 'Fără descriere'}">Descriere</p>
+                        <div class="muted">Întrebări:</div>
+                        <ul>
+                            <li th:each="q : ${questionsByTest[test.id]}">
+                                <span th:text="${q.text}">Întrebare</span>
+                                <br>
+                                <small class="muted">
+                                    A) <span th:text="${q.optionA}"></span> |
+                                    B) <span th:text="${q.optionB}"></span> |
+                                    C) <span th:text="${q.optionC}"></span> |
+                                    D) <span th:text="${q.optionD}"></span>
+                                    — corect: <span th:text="${q.correctIndex} == 0 ? 'A' : (${q.correctIndex} == 1 ? 'B' : (${q.correctIndex} == 2 ? 'C' : 'D'))"></span>
+                                </small>
+                            </li>
+                            <li th:if="${questionsByTest[test.id] == null || #lists.isEmpty(questionsByTest[test.id])}" class="muted">Nu sunt întrebări încă.</li>
+                        </ul>
+                        <form class="form-grid" th:action="@{'/tests/' + ${test.id} + '/questions'}" method="post">
+                            <div class="field">
+                                <label>Întrebare</label>
+                                <input name="text" type="text" placeholder="Scrie întrebarea" required>
+                            </div>
+                            <div class="field">
+                                <label>Variante</label>
+                                <input name="optionA" type="text" placeholder="Varianta A" required>
+                                <input name="optionB" type="text" placeholder="Varianta B" required>
+                                <input name="optionC" type="text" placeholder="Varianta C" required>
+                                <input name="optionD" type="text" placeholder="Varianta D" required>
+                            </div>
+                            <div class="field">
+                                <label>Index corect (0=A, 1=B, 2=C, 3=D)</label>
+                                <input name="correctIndex" type="number" min="0" max="3" value="0" required>
+                            </div>
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <button type="submit" class="secondary-button">Adaugă întrebare</button>
+                        </form>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>
